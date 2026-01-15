@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>全球趨勢雷達 | 格柵思維分析系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,9 +14,9 @@
             --tang-ink: #050505;
             --tang-paper: #fdf5e6;
             --tang-silk: #121212;
-            --radius-lg: 2.5rem;   /* 大面板圓角 */
-            --radius-md: 1.5rem;   /* 卡片圓角 */
-            --radius-sm: 0.75rem;  /* 小型元素圓角 */
+            --radius-lg: 2.5rem;
+            --radius-md: 1.5rem;
+            --radius-sm: 0.75rem;
         }
         
         body {
@@ -30,6 +30,7 @@
                 radial-gradient(at 100% 100%, rgba(197, 160, 68, 0.1) 0px, transparent 60%);
             background-attachment: fixed;
             position: relative;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body::before {
@@ -46,92 +47,84 @@
         .mono { font-family: 'JetBrains Mono', monospace; }
 
         .tang-panel {
-            background: rgba(18, 18, 18, 0.7);
+            background: rgba(18, 18, 18, 0.75);
             backdrop-filter: blur(25px);
-            border: 1px solid rgba(197, 160, 68, 0.25);
+            border: 1px solid rgba(197, 160, 68, 0.2);
             border-radius: var(--radius-lg);
             position: relative;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.8);
         }
 
         .tang-panel::before, .tang-panel::after {
             content: "";
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border: 2px solid var(--tang-red);
-            opacity: 0.4;
+            opacity: 0.3;
         }
-        .tang-panel::before { 
-            top: -2px; left: -2px; 
-            border-right: 0; border-bottom: 0; 
-            border-top-left-radius: var(--radius-lg);
-        }
-        .tang-panel::after { 
-            bottom: -2px; right: -2px; 
-            border-left: 0; border-top: 0; 
-            border-bottom-right-radius: var(--radius-lg);
-        }
+        .tang-panel::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; border-top-left-radius: var(--radius-lg); }
+        .tang-panel::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; border-bottom-right-radius: var(--radius-lg); }
 
         .tang-card {
-            background: rgba(30, 30, 30, 0.4);
-            border: 1px solid rgba(197, 160, 68, 0.2);
+            background: rgba(25, 25, 25, 0.45);
+            border: 1px solid rgba(197, 160, 68, 0.15);
             border-radius: var(--radius-md);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
-        .tang-card:hover {
-            background: rgba(163, 0, 0, 0.15); 
-            border-color: var(--tang-gold);
-            transform: translateY(-8px) scale(1.04); 
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.8), 
-                0 0 20px rgba(163, 0, 0, 0.25); 
-            z-index: 10; 
+        .tang-card:active { transform: scale(0.98); }
+        
+        @media (min-width: 1024px) {
+            .tang-card:hover {
+                background: rgba(163, 0, 0, 0.12); 
+                border-color: var(--tang-gold);
+                transform: translateY(-5px) scale(1.02); 
+                box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.9);
+            }
         }
 
         .seal {
             border: 1px solid var(--tang-red);
             color: #ff4d4d;
-            padding: 4px 14px;
+            padding: 2px 10px;
             font-weight: 700;
-            font-size: 11px;
-            letter-spacing: 0.15em;
-            background: rgba(163, 0, 0, 0.15);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            background: rgba(163, 0, 0, 0.1);
             display: inline-block;
             border-radius: 9999px;
         }
 
-        .scroll-container {
-            border-top: 1px solid rgba(197, 160, 68, 0.3);
-            border-bottom: 1px solid rgba(197, 160, 68, 0.3);
-            padding: 45px 0;
-            position: relative;
+        .article-content {
+            font-family: 'Noto Serif TC', serif;
+            color: #e5e5e5;
+            line-height: 2.2;
         }
+        .article-content h1 { font-size: 2.5rem; font-weight: 900; color: var(--tang-gold); text-align: center; margin-bottom: 3rem; }
+        @media (max-width: 768px) { .article-content h1 { font-size: 1.8rem; } }
 
         .btn-tang {
             background: linear-gradient(135deg, #c5a044, #8b6508);
-            color: #1a1a1a;
-            font-weight: 800;
-            letter-spacing: 0.2em;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.1);
+            color: #050505;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            box-shadow: 0 4px 15px rgba(197, 160, 68, 0.2);
             border-radius: var(--radius-sm);
         }
-        .btn-tang:hover {
-            filter: brightness(1.2);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 25px rgba(197, 160, 68, 0.3);
-            border-radius: var(--radius-md);
+
+        .mobile-nav-blur {
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(197, 160, 68, 0.2);
         }
 
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: var(--tang-ink); }
         ::-webkit-scrollbar-thumb { background: var(--tang-gold); border-radius: 10px; }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 <script type="importmap">
 {
@@ -147,7 +140,7 @@
 }
 </script>
 </head>
-<body>
+<body class="pb-24 lg:pb-0">
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
 </body>

@@ -6,9 +6,6 @@ const cleanJsonResponse = (text: string) => {
   return text.replace(/```json\n?|```/g, '').trim();
 };
 
-/**
- * 提取模型的回傳思考過程 (Reasoning/Thought)
- */
 const extractThought = (response: any): string => {
   const parts = response.candidates?.[0]?.content?.parts || [];
   return parts
@@ -18,7 +15,6 @@ const extractThought = (response: any): string => {
 };
 
 export const analyzeTrend = async (query: string): Promise<TrendAnalysis> => {
-  // 嚴格依照指南：在每次呼叫前初始化 GoogleGenAI
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
   
   const response = await ai.models.generateContent({
@@ -150,7 +146,6 @@ export const analyzeTrend = async (query: string): Promise<TrendAnalysis> => {
     }
   });
 
-  // 使用指南推薦的 .text 屬性（注意：思考過程通常不會包含在 .text 中，需手動提取）
   const rawText = response.text || "{}";
   const thought = extractThought(response);
   const jsonStr = cleanJsonResponse(rawText);
@@ -166,6 +161,7 @@ export const analyzeTrend = async (query: string): Promise<TrendAnalysis> => {
 
   return {
     ...rawData,
+    id: crypto.randomUUID(),
     thought,
     sources,
     timestamp: new Date().toISOString()
@@ -180,14 +176,15 @@ export const generateArticle = async (data: TrendAnalysis): Promise<string> => {
     分析主題：${data.title}
     
     文章架構要求：
-    1. 標題：起一個具有震懾力、大師感的專欄標題。
-    2. 導讀：用一個具體的場景或生活例子切入，帶出目前全球正在發生的巨變。
-    3. 格柵拆解：將五大驅動力融合進敘事，不要死板條列。用「故事＋邏輯」的方式解釋為什麼 ${Object.values(DrivingForce).join('、')} 正在交織。
-    4. 投資者的指南針：根據數據中的投資佈局，詳細解釋其背後的戰略價值。
-    5. 證偽思考：引用證偽協議與物理極限，展現格柵思維的理性與不盲從。
-    6. 結論：給讀者一段具備行動啟發性的總結。
+    1. 使用 Markdown 格式：標題請用 # 與 ##，重點與列表請用 *，引用請用 >。
+    2. 標題：起一個具有震懾力、大師感的專欄標題。
+    3. 導讀：用一個具體的場景或生活例子切入。
+    4. 格柵拆解：將五大驅動力融合進敘事，分析其背後的跨學科邏輯。
+    5. 投資者的指南針：根據數據中的投資佈局，詳細解釋其背後的戰略價值。
+    6. 證偽思考：引用證偽協議與物理極限。
+    7. 結論：總結並給予行動啟發。
     
-    寫作風格：生動、白話但具備專業深度（查理·蒙格風格）。必須超過 1000 字繁體中文。
+    寫作風格：查理·蒙格風格，深刻、諷刺且富有理性。必須超過 1000 字繁體中文。
     
     詳細數據參考：
     摘要：${data.summary}

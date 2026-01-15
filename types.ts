@@ -35,6 +35,7 @@ export interface GroundingSource {
 }
 
 export interface TrendAnalysis {
+  id: string; // 唯一識別碼
   title: string;
   summary: string;
   thought?: string; // AI 的思考推演過程
@@ -61,4 +62,5 @@ export interface RadarState {
   result: TrendAnalysis | null;
   error: string | null;
   selectedForceKey: DrivingForce | null;
+  history: TrendAnalysis[]; // 歷史紀錄列表
 }
