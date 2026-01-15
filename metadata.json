@@ -1,0 +1,7 @@
+{
+  "name": "全球趨勢雷達系統",
+  "description": "精密的戰略分析平台，運用查理·蒙格的「格柵思維」與即時 Google 搜尋接地技術，透過五大關鍵驅動力解構全球趨勢。",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
