@@ -3,17 +3,12 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 import { TrendAnalysis, DrivingForce } from "../types";
 
-const getApiKey = () => {
-  return typeof process !== 'undefined' ? process.env.API_KEY : (window as any).API_KEY;
-};
-
 const cleanJsonResponse = (text: string) => {
-  // 移除可能存在的 Markdown 標籤，如 ```json ... ```
   return text.replace(/```json\n?|```/g, '').trim();
 };
 
 /**
- * 手動提取回傳內容中的文字部分，避免 SDK 內部針對 thoughtSignature 發出警告
+ * 手動提取回傳內容中的文字部分，避免呼叫可能觸發警告的 .text 屬性（針對包含思考過程的回應）
  */
 const extractText = (response: any): string => {
   const parts = response.candidates?.[0]?.content?.parts || [];
@@ -35,10 +30,9 @@ const extractThought = (response: any): string => {
 };
 
 export const analyzeTrend = async (query: string): Promise<TrendAnalysis> => {
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error("API Key is missing.");
-
-  const ai = new GoogleGenAI({ apiKey });
+  // 按照指南：在每次 API 呼叫前實例化，並直接使用 process.env.API_KEY
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+  
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `[目前的真實日期: ${new Date().toLocaleDateString()}] \n\n 使用者輸入信號: ${query}`,
@@ -46,7 +40,6 @@ export const analyzeTrend = async (query: string): Promise<TrendAnalysis> => {
       systemInstruction: SYSTEM_INSTRUCTION,
       tools: [{ googleSearch: {} }],
       responseMimeType: "application/json",
-      // 設定較高的 thinkingBudget 以獲得更好的分析深度（僅限支援模型）
       thinkingConfig: { thinkingBudget: 4000 },
       responseSchema: {
         type: Type.OBJECT,
@@ -191,10 +184,7 @@ export const analyzeTrend = async (query: string): Promise<TrendAnalysis> => {
 };
 
 export const generateArticle = async (data: TrendAnalysis): Promise<string> => {
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error("API Key is missing.");
-
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
   const prompt = `
     請根據以下「全球趨勢雷達分析數據」撰寫一篇深度專題文章。
     
@@ -228,6 +218,6 @@ export const generateArticle = async (data: TrendAnalysis): Promise<string> => {
     }
   });
 
-  const text = extractText(response);
-  return text || "深度文章生成中斷，請重試。";
+  // 使用 .text 屬性獲取結果
+  return response.text || "深度文章生成中斷，請重試。";
 };
