@@ -1,21 +1,9 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 import { TrendAnalysis, DrivingForce } from "../types";
 
 const cleanJsonResponse = (text: string) => {
   return text.replace(/```json\n?|```/g, '').trim();
-};
-
-/**
- * 手動提取回傳內容中的文字部分，避免呼叫可能觸發警告的 .text 屬性（針對包含思考過程的回應）
- */
-const extractText = (response: any): string => {
-  const parts = response.candidates?.[0]?.content?.parts || [];
-  return parts
-    .filter((part: any) => part.text)
-    .map((part: any) => part.text)
-    .join("");
 };
 
 /**
@@ -26,11 +14,11 @@ const extractThought = (response: any): string => {
   return parts
     .filter((part: any) => part.thought)
     .map((part: any) => part.thought)
-    .join("");
+    .join("\n");
 };
 
 export const analyzeTrend = async (query: string): Promise<TrendAnalysis> => {
-  // 按照指南：在每次 API 呼叫前實例化，並直接使用 process.env.API_KEY
+  // 嚴格依照指南：在每次呼叫前初始化 GoogleGenAI
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
   
   const response = await ai.models.generateContent({
@@ -162,7 +150,8 @@ export const analyzeTrend = async (query: string): Promise<TrendAnalysis> => {
     }
   });
 
-  const rawText = extractText(response) || "{}";
+  // 使用指南推薦的 .text 屬性（注意：思考過程通常不會包含在 .text 中，需手動提取）
+  const rawText = response.text || "{}";
   const thought = extractThought(response);
   const jsonStr = cleanJsonResponse(rawText);
   const rawData = JSON.parse(jsonStr);
@@ -218,6 +207,5 @@ export const generateArticle = async (data: TrendAnalysis): Promise<string> => {
     }
   });
 
-  // 使用 .text 屬性獲取結果
   return response.text || "深度文章生成中斷，請重試。";
 };
